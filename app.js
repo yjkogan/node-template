@@ -22,7 +22,8 @@ app.configure(function() {
   app.use(function (err, req, res, next) {
     
     // log it
-    console.log("Error is: " +err);
+    console.log("Error is:");
+    console.log(err);
 
     if (err.stack) {
       console.log(err.stack);
