@@ -2,7 +2,8 @@ require('./config');
 
 var express = require('express')
   , hoganEngine = require('hogan-engine')
-  , app = express();
+  , app = express()
+  , db = require(APP_ROOT+'/config/db');
 
 module.exports = app;
 
@@ -38,7 +39,6 @@ app.configure(function() {
   app.use(function (req, res, next) {
     res.render('errors/404', { url: req.originalUrl });
   });
-
 })
 
 app.listen(process.env.PORT);
