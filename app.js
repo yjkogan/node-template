@@ -1,16 +1,17 @@
 require('./config');
 
 var express = require('express')
+  , nunjucks = require('nunjucks')
   , cookieParser = require('cookie-parser')
   , bodyParser = require('body-parser')
-  , expressHbs = require('express3-handlebars')
   , app = express();
 
 module.exports = app;
 
-app.set('views', __dirname + '/app/templates');
-app.engine('hbs', expressHbs({extname:'hbs', defaultLayout: __dirname + '/app/templates/base/main.hbs'}));
-app.set('view engine', 'hbs');
+nunjucks.configure(__dirname + '/app/templates', {
+    autoescape: true,
+    express: app
+});
 
 app.use(express.static(__dirname + '/public'));
 
@@ -40,7 +41,7 @@ app.use(function (err, req, res, next) {
 
 // assume 404 since no middleware responded
 app.use(function (req, res, next) {
-  res.render('errors/404', { url: req.originalUrl });
+  res.render('errors/404.html', { url: req.originalUrl });
 });
 
 app.listen(process.env.PORT);
