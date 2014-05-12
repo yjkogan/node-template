@@ -1,45 +1,47 @@
 require('./config');
 
 var express = require('express')
-  , hoganEngine = require('hogan-engine')
+  , cookieParser = require('cookie-parser')
+  , bodyParser = require('body-parser')
+  , expressHbs = require('express3-handlebars')
   , app = express();
 
 module.exports = app;
 
-app.configure(function() {
-  app.engine('html', hoganEngine);
-  app.set('views', __dirname + '/app/templates');
-  app.set('view engine', 'html');
-  app.use(express.static(__dirname + '/public'));
+app.set('views', __dirname + '/app/templates');
+app.engine('hbs', expressHbs({extname:'hbs', defaultLayout: __dirname + '/app/templates/base/main.hbs'}));
+app.set('view engine', 'hbs');
 
-  // Enable us to get form data / read the body
-  app.use(express.bodyParser());
+app.use(express.static(__dirname + '/public'));
 
-  // Require the routes
-  require('./app/routes');
+// Enable us to get form data / read the body
+app.use(bodyParser())
+// Enable access to cookies
+app.use(cookieParser());
 
-  //Error handling
-  app.use(function (err, req, res, next) {
-    
-    // log it
-    console.log("Error is:");
-    console.log(err);
+// Require the routes
+require('./app/routes');
 
-    if (err.stack) {
-      console.log(err.stack);
-    }
+//Error handling
+app.use(function (err, req, res, next) {
+  
+  // log it
+  console.log("Error is:");
+  console.log(err);
 
-    // error page
-    res.status(500).send(err);
+  if (err.stack) {
+    console.log(err.stack);
+  }
 
-  });
+  // error page
+  res.status(500).send(err);
 
-  // assume 404 since no middleware responded
-  app.use(function (req, res, next) {
-    res.render('errors/404', { url: req.originalUrl });
-  });
+});
 
-})
+// assume 404 since no middleware responded
+app.use(function (req, res, next) {
+  res.render('errors/404', { url: req.originalUrl });
+});
 
 app.listen(process.env.PORT);
 console.log("Listening on port " + process.env.PORT);
